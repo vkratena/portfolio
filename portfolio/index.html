@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio | Vojtěch Kratěna</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #16a34a; /* ČZU Zelená */
+            --bg: #f8fafc;      
+            --card-bg: #ffffff; 
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
+        body { background-color: var(--bg); color: var(--text-main); line-height: 1.6; }
+
+        /* --- CAROUSEL SEKCE --- */
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            height: 60vh; /* Výška přes 60% obrazovky */
+            overflow: hidden;
+            background: #000;
+        }
+
+        .carousel-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none; 
+        }
+
+        .carousel-slide.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .carousel-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.6; 
+        }
+
+        .carousel-caption {
+            position: absolute;
+            color: white;
+            text-align: center;
+            z-index: 10;
+            padding: 0 20px;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.8);
+        }
+
+        .carousel-caption h2 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Šipky pro carousel */
+        .carousel-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.4);
+            color: white;
+            border: none;
+            font-size: 2rem;
+            padding: 1rem;
+            cursor: pointer;
+            z-index: 20;
+            transition: background-color 0.3s ease;
+            user-select: none;
+        }
+
+        .carousel-arrow:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+
+        .arrow-prev {
+            left: 0;
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+
+        .arrow-next {
+            right: 0;
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+        }
+
+        /* --- HLAVIČKA (ZJEDNODUŠENÁ) --- */
+        header {
+            text-align: center;
+            padding: 3rem 1rem;
+            background: linear-gradient(to bottom, #ffffff, #f8fafc);
+            border-bottom: 1px solid var(--border);
+        }
+
+        h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem; letter-spacing: -0.05em; }
+        
+        .subtitle { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 1rem; }
+
+        .social-links a {
+            color: var(--text-main);
+            font-size: 1.1rem; 
+            font-weight: 600;
+            margin: 0 10px;
+            transition: color 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .social-links a:hover { color: var(--primary); }
+
+        /* --- PROJEKTY GRID --- */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 3rem 1rem;
+        }
+
+        h2.section-title { margin-bottom: 2rem; font-size: 1.5rem; border-left: 5px solid var(--primary); padding-left: 1rem; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+
+        .card-img-top {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background-color: #cbd5e1;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .card-content { padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column; }
+        .card h3 { margin-bottom: 0.5rem; font-size: 1.25rem; }
+        
+        .tech-stack {
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .tech-pill {
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: #f1f5f9;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+        }
+
+        .card p {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            flex-grow: 1;
+            /* Odstraněno omezování počtu řádků */
+        }
+
+        .btn-link {
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            padding: 0;
+            font-size: 1rem;
+        }
+        .btn-link:hover { text-decoration: underline; }
+
+        /* --- MODAL (POP-UP) STYLY --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 1rem;
+        }
+
+        .modal-content {
+            background: white;
+            width: 100%;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border-radius: 12px;
+            padding: 2rem;
+            position: relative;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+        .close-btn:hover { color: var(--text-main); }
+
+        .modal-body h3 { margin-top: 2rem; margin-bottom: 0.5rem; color: var(--text-main); border-bottom: 2px solid #f1f5f9; padding-bottom: 0.5rem; }
+        .modal-body p { margin-bottom: 1rem; color: var(--text-main); }
+        .modal-body ul { margin-left: 1.5rem; margin-bottom: 1rem; }
+        .modal-body li { margin-bottom: 0.5rem; }
+        
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--primary);
+            white-space: pre;
+        }
+
+        .project-image {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            margin-top: 0.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .download-btn {
+            display: inline-block;
+            background-color: #f1f5f9;
+            color: var(--text-main);
+            padding: 10px 15px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 10px;
+            margin-right: 10px;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+        .download-btn:hover {
+            background-color: var(--border);
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border);
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="carousel-container" id="carousel">
+        <button class="carousel-arrow arrow-prev" onclick="manualPrev()">&#10094;</button>
+        <button class="carousel-arrow arrow-next" onclick="manualNext()">&#10095;</button>
+    </div>
+
+    <header>
+        <h1>Vojtěch Kratěna</h1>
+        <p class="subtitle">Student systémového inženýrství na ČZU v Praze</p>
+        
+        <div class="social-links">
+            <a href="mailto:vkratena@seznam.cz" title="Napsat e-mail"><i class="fas fa-envelope"></i> vkratena@seznam.cz</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2 class="section-title">Vybrané projekty</h2>
+        <div class="grid" id="projects-grid">
+            </div>
+    </div>
+
+    <div class="modal-overlay" id="project-modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <div id="modal-body-content" class="modal-body">
+                </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Vojtěch Kratěna. Built for the future.</p>
+    </footer>
+
+    <script>
+        // DATA PROJEKTŮ
+        const projects = [
+            {
+                id: 1,
+                title: "Databázový systém pro Zemědělský podnik",
+                image: "databaze.jpg",
+                tags: ["PostgreSQL", "SQL", "Databázový návrh", "ER Model"],
+                shortDesc: "Komplexní návrh relační databáze pro správu pěstování plodin, evidenci techniky, zaměstnanců a skladového hospodářství.",
+                details: `
+                    <h2>Databáze pěstování plodin</h2>
+                    <p><strong>Cíl projektu:</strong> Vytvoření robustního datového modelu pro zemědělský podnik, který řeší celý cyklus od plánování sadby až po prodej nebo uskladnění plodin.</p>
+                    <h3>Schémata databáze</h3>
+                    <p>Návrh probíhal ve dvou fázích. Nejprve vytvoření konceptuálního schématu pro zachycení vztahů entit a následně převod do relačního schématu pro fyzickou implementaci.</p>
+                    <strong>Konceptuální schéma:</strong><br>
+                    <img src="koncschema.jpg" alt="Konceptuální schéma" class="project-image">
+                    <strong>Relační schéma:</strong><br>
+                    <img src="relschema.jpg" alt="Relační schéma" class="project-image">
+                    <h3>Vybrané SQL dotazy</h3>
+                    <p><i>1. Jméno, mzda a pracovní doba zaměstnanců, kteří pracovali na plánu sadby s id 1 (JOIN):</i></p>
+                    <div class="code-block">
+SELECT zamestnanec.jmeno, zamestnanec.prijmeni, zamestnanec.plat, pracovni_doba.od_kdy, pracovni_doba.do_kdy 
+FROM zamestnanec 
+JOIN pracovni_doba ON zamestnanec.id_zamestnanec = pracovni_doba.id_zamestnanec 
+WHERE pracovni_doba.id_sadba = 1;
+                    </div>
+                    <p><i>2. Zaměstnanci, kteří mají nadprůměrný plat (Vnořený dotaz):</i></p>
+                    <div class="code-block">
+SELECT zamestnanec.jmeno, zamestnanec.prijmeni, zamestnanec.plat 
+FROM zamestnanec 
+WHERE plat > (SELECT AVG(plat) FROM zamestnanec);
+                    </div>
+                    <p><i>3. Vytvoření pohledu na pracovní dobu všech zaměstnanců (VIEW):</i></p>
+                    <div class="code-block">
+CREATE VIEW view_pracdoba AS
+SELECT z.id_zamestnanec, z.jmeno, z.prijmeni, p.od_kdy, p.do_kdy
+FROM zamestnanec z
+JOIN pracovni_doba p ON z.id_zamestnanec = p.id_zamestnanec;
+                    </div>
+                    <p><i>4. Použití pohledu - Pracovní doba paní Svobodové:</i></p>
+                    <div class="code-block">
+SELECT * FROM view_pracdoba WHERE prijmeni = 'Svobodová';
+                    </div>
+                    <p><i>5. Rekonstrukce skladů - UPDATE s vnořeným dotazem:</i></p>
+                    <div class="code-block">
+UPDATE sklad
+SET kapacita = prumer_kapacity.avgkapacita
+FROM (SELECT AVG(kapacita) AS avgkapacita FROM sklad) AS prumer_kapacity
+WHERE sklad.kapacita < 120;
+                    </div>
+                    <h3>Co jsem se naučil</h3>
+                    <p>Tento projekt byl mým prvním setkáním s tvorbou databází. Ze začátku to pro mě byla velká výzva, ale postupně jsem pochopil, jak fungují základní vztahy mezi daty a jak navrhnout smysluplné schéma. Vyzkoušel jsem si psaní SQL dotazů v praxi a i když je relační algebra složitá, naučil jsem se základy syntaxe a logiky, kterou teď dokážu využít při práci s daty.</p>
+                `
+            },
+            {
+                id: 2,
+                title: "Systémová dynamika: Hospodaření mysliveckého spolku",
+                image: "myslivecky_spolek.jpg",
+                tags: ["Vensim", "Simulace", "Systémové myšlení", "Management"],
+                shortDesc: "Simulace plánování odlovu zvěře a hospodaření spolku. Analýza zpoždění informací a ekonomických dopadů škod na zemědělství.",
+                details: `
+                    <h2>Hospodaření mysliveckého spolku</h2>
+                    <p><strong>Cíl projektu:</strong> Vytvořit simulační model, který zkoumá dynamiku plánování odlovu zvěře tak, aby nedošlo k jejímu přemnožení a následnému ničení zemědělských ploch.</p>
+                    <h3>Klíčové problémy modelu</h3>
+                    <ul>
+                        <li><strong>Zpoždění informací:</strong> Myslivci plánují odlov na základě zastaralých nebo nepřesných informací o skutečném stavu zvěře v lese.</li>
+                        <li><strong>Ekonomická bilance:</strong> Model řeší dilema mezi investicemi do prevence škod (krmivo, zábrany) a nutností splácet škody způsobené zvěří zemědělcům.</li>
+                        <li><strong>Scénáře:</strong> Porovnání "Konzervativní varianty" (nižší žádaný stav zvěře) a "Riskantnější varianty" (vyšší stavy, větší riziko škod).</li>
+                    </ul>
+                    <h3>Co jsem si vyzkoušel</h3>
+                    <p>Na tomto projektu jsem pochopil, jak zrádná mohou být časová zpoždění v manažerském rozhodování. Naučil jsem se převádět mentální modely do formálních simulací a kalibrovat model tak, aby odpovídal realitě. Vyzkoušel jsem si práci se scénáři, což mi ukázalo, že neexistuje jedno "správné" řešení, ale spíše hledání rovnováhy mezi ekonomickými a ekologickými cíli.</p>
+                    <h3>Poster projektu</h3>
+                    <p>Kompletní přehled projektu ve formě posteru:</p>
+                    <img src="poster.jpg" alt="Poster projektu" class="project-image">
+                    
+                    <br><br>
+                    <a href="poster_spolek.pdf" class="download-btn" target="_blank" download>
+                        <i class="fas fa-file-pdf"></i> Stáhnout PDF (Poster)
+                    </a>
+                `
+            },
+            {
+                id: 4,
+                title: "Ekonometrický model těžby modřínu",
+                image: "modrin.jpg",
+                tags: ["Gretl", "Ekonometrie", "Regresní analýza", "Statistika"],
+                shortDesc: "Analýza faktorů ovlivňujících těžbu modřínu v ČR (2000–2024). Využití jednorovnicových i simultánních modelů k predikci tržního chování.",
+                details: `
+                    <h2>Ekonometrický model těžby modřínu</h2>
+                    <p><strong>Cíl projektu:</strong> Kvantifikovat vztahy mezi objemem těžby modřínu a vybranými ekonomickými a výrobními faktory, jako je těžba buku, plocha jehličnatých porostů a zaměstnanost v sektoru.</p>
+                    <h3>Použité metody</h3>
+                    <p>Projekt byl zpracován v softwaru <strong>Gretl</strong> s využitím dat ČSÚ (2000–2024). Analýza probíhala ve dvou fázích:</p>
+                    <ul>
+                        <li><strong>Jednorovnicový model (OLS):</strong> Vysvětloval 76,6 % variability těžby modřínu.</li>
+                        <li><strong>Simultánní model (TSLS):</strong> Dvourovnicový systém zkoumající vzájemnou vazbu mezi těžbou modřínu a borovice.</li>
+                    </ul>
+                    <h3>Ekonomická verifikace</h3>
+                    <p>Simulace scénářů ukázala nízkou citlivost těžby na změnu počtu zaměstnanců (neelastický vztah), což naznačuje vysokou míru mechanizace v současném lesním hospodářství.</p>
+                    <h3>Výsledné rovnice simultánního modelu</h3>
+                    <p>y1𝑡 = 2 692 670+0,0846𝑦2𝑡 +0,1402𝑥1𝑡 −1,3676𝑥2𝑡 +914,82𝑥3𝑡 +𝑢1𝑡</p>
+                    <p>y2𝑡 = −6 734 340+2,5394𝑦1𝑡 +1,00𝑥1𝑡 +3,1582𝑥2𝑡 +19,5898𝑥4𝑡 +𝑢2t</p>
+                    <p><strong>Kde:</strong></p>
+                    <ul>
+                        <li>y1 = těžba modřínu</li>
+                        <li>x1 = těžba buku</li>
+                        <li>x2 = celková plocha jehličnanů</li>
+                        <li>x3 = počet zaměstnanců v lesnicví a zemědělství</li>
+                        <li>x4 = roční zalesněná plocha</li>
+                        <li>y2 = těžba borovice</li>
+                    </ul>
+                    <p>Výsledky tohoto modelu prokázaly existenci silné oboustranné pozitivní vazby mezi těžbou modřínu a borovice. V rovnici pro modřín, která vysvětlila téměř 80 % variability, byl potvrzen statisticky významný vliv těžby borovice a plochy porostů, přičemž model vyhověl všem ekonometrickým testům. U rovnice pro borovici se jako klíčový faktor ukázala těžba modřínu. Ačkoliv byla v tomto případě zamítnuta hypotéza o normalitě reziduí, ostatní statistické předpoklady včetně validity použitých instrumentů byly splněny, což potvrzuje robustnost odhadů.</p>
+                    
+                    <br><br>
+                    <a href="seminarka_modrin.pdf" class="download-btn" target="_blank" download>
+                        <i class="fas fa-file-pdf"></i> Stáhnout PDF (Seminární práce)
+                    </a>
+                `
+            },
+            {
+                id: 5,
+                title: "Analýza marketingového mixu v Prusa Research",
+                image: "prusa.jpg",
+                tags: ["Marketing", "SWOT", "4P Analýza", "Průzkum trhu"],
+                shortDesc: "Komplexní analýza marketingové strategie společnosti Prusa Research, srovnání s konkurencí (Bambulab, Creality) a doporučení pro další rozvoj.",
+                details: `
+                    <h2>Analýza marketingového mixu v Prusa Research</h2>
+                    <p><strong>Cíl projektu:</strong> Cílem projektu byla analýza využívání digitálního a online marketingu ve společnosti Prusa Research, porovnání s konkurencí a návrh konkrétních vylepšení.</p>
+                    <h3>Marketingový mix (4P)</h3>
+                    <ul>
+                        <li><strong>Produkt:</strong> Výroba 3D tiskáren (MK4, XL, MINI) a vlastních filamentů s důrazem na inovace a kvalitu.</li>
+                        <li><strong>Cena:</strong> Diferencovaná cenová politika (od 10 tis. do 250 tis. Kč), vnímána jako vyšší oproti asijské konkurenci.</li>
+                        <li><strong>Místo:</strong> Výhradně online distribuce přes vlastní e-shop do 160 zemí světa.</li>
+                        <li><strong>Propagace:</strong> Silná orientace na komunitu, obsahový marketing a osobnost Josefa Průši.</li>
+                    </ul>
+                    <h3>Analýza konkurence</h3>
+                    <p>Hlavními konkurenty jsou Bambulab (rychlost, nižší cena) a Creality (cenová dostupnost). Prusa vítězí v loajalitě zákazníků a kvalitě podpory, ale ztrácí v cenové dostupnosti pro začátečníky.</p>
+                    <h3>SWOT Analýza</h3>
+                    <ul>
+                        <li><strong>Silné stránky:</strong> Kvalitní produkty, angažovaná komunita.</li>
+                        <li><strong>Slabé stránky:</strong> Vysoké náklady na vývoj, pomalejší reakce na trh.</li>
+                        <li><strong>Příležitosti:</strong> Průmyslové využití tisku, nové materiály.</li>
+                        <li><strong>Hrozby:</strong> Levná konkurence kopírující inovace.</li>
+                    </ul>
+                    <h3>Analýza zákazníka</h3>
+                    <img src="prusa_poster.jpg" alt="Poster projektu" class="project-image">
+
+                    <br><br>
+                    <div style="display: flex; flex-wrap: wrap;">
+                        <a href="prusa_poster.pdf" class="download-btn" target="_blank" download>
+                            <i class="fas fa-file-pdf"></i> Stáhnout Poster (PDF)
+                        </a>
+                        <a href="prusa_zakaznici.pdf" class="download-btn" target="_blank" download>
+                            <i class="fas fa-file-pdf"></i> Stáhnout Analýzu zákazníků (PDF)
+                        </a>
+                    </div>
+                `
+            },
+            {
+                id: 6,
+                title: "Informační systém pro Bažantnici",
+                image: "bazantnice.jpg",
+                tags: ["UML", "Návrh IS", "Procesní modelování"],
+                shortDesc: "Návrh komplexního informačního systému pro správu chovu, logistiky a obchodu v bažantnici. Náhrada papírové evidence moderním řešením.",
+                details: `
+                    <h2>Informační systém pro Bažantnici</h2>
+                    <p><strong>Cíl projektu:</strong> Návrh komplexního řešení pro digitální správu bažantnice. Cílem bylo nahradit složitou papírovou evidenci systémem, který propojuje biologickou péči o zvířata, logistiku krmiva a obchodní procesy (prodej masa, organizace honů).</p>
+                    <h3>Klíčové funkce systému</h3>
+                    <ul>
+                        <li><strong>Evidence chovu:</strong> Sledování bažantů od vylíhnutí, správa hejn, plemen a umístění (klece, výběhy).</li>
+                        <li><strong>Logistika:</strong> Automatizace skladových zásob krmiva, správa dodavatelů a sledování spotřeby.</li>
+                        <li><strong>Obchod a Lov:</strong> Organizace honů pro zákazníky, prodej produktů, fakturace a věrnostní programy.</li>
+                    </ul>
+                    <h3>Použité modelovací techniky (UML)</h3>
+                    <p>Pro návrh architektury jsme využili sadu UML diagramů:</p>
+                    <ul>
+                        <li><strong>UseCase diagram:</strong> Definice interakcí mezi zaměstnanci (krmič, veterinář) a systémem.</li>
+                        <li><strong>Stavové diagramy:</strong> Modelování životního cyklu bažanta (narozen -> ve výběhu -> uloven/prodán) a stavů objednávky.</li>
+                        <li><strong>Sekvenční diagram:</strong> Detailní průběh realizace objednávky v čase.</li>
+                    </ul>
+                    <h3>Objektový model (Diagram tříd)</h3>
+                    <p>Jádrem návrhu je detailní diagram tříd, který definuje datovou strukturu systému a vazby mezi entitami (Zvíře, Zaměstnanec, Událost, Sklad).</p>
+                    <img src="diagram_trid.jpg" alt="Diagram tříd informačního systému" class="project-image">
+                    
+                    <br><br>
+                    <a href="bazantnice.pdf" class="download-btn" target="_blank" download>
+                        <i class="fas fa-file-pdf"></i> Stáhnout Seminární práci (PDF)
+                    </a>
+                `
+            },
+            {
+                id: 7,
+                title: "Bakalářská práce: Projekt plánování letního tábora",
+                image: "tabor.jpg",
+                tags: ["MS Project", "Procesní řízení", "Optimalizace", "Management"],
+                shortDesc: "Optimalizace procesů organizace letních táborů v Salesiánském středisku mládeže. Využití Ganttova diagramu a procesních modelů.",
+                details: `
+                    <h2>Projekt plánování letního tábora</h2>
+                    <p><strong>Cíl projektu:</strong> Analýza a optimalizace organizačních procesů letních táborů v Salesiánském středisku mládeže Praha-Kobylisy. Cílem bylo odstranit nedostatky v plánování a vytvořit manuál pro koordinátory.</p>
+                    <h3>Využití Ganttova diagramu</h3>
+                    <p>Jako klíčový nástroj pro řízení času a návaznosti úkolů byl využit <strong>Microsoft Project</strong>. Vytvořený Ganttův diagram umožnil vizualizovat celý harmonogram příprav, odhalit kritická místa a lépe koordinovat tým vedoucích.</p>
+                    <img src="gannt.png" alt="Ganttův diagram plánování tábora" class="project-image">
+                    <h3>Procesní modelování</h3>
+                    <p>Pro detailní pochopení toku činností byly vytvořeny procesní modely. Analýza "stávajícího stavu" odhalila problémy s dodržováním termínů a kolizemi úkolů. Následně byl navržen <strong>optimalizovaný model</strong>, který zavedl dřívější termíny schůzek a efektivnější řešení přihlášek.</p>
+                    <img src="procesní_model.jpg" alt="Procesní model přihlašování" class="project-image">
+                    <h3>Výsledky práce</h3>
+                    <ul>
+                        <li><strong>Nový harmonogram:</strong> Zavedení dřívějších termínů pro klíčová rozhodnutí (obsazení vedoucích, materiální zajištění).</li>
+                        <li><strong>Manuál koordinátora:</strong> Definování kompetenčního profilu a vytvoření praktického manuálu pro efektivní řízení akcí.</li>
+                        <li><strong>Zefektivnění administrativy:</strong> Úprava procesů plateb a registrace účastníků.</li>
+                    </ul>
+                    
+                    <br><br>
+                    <a href="letni_tabor.pdf" class="download-btn" target="_blank" download>
+                        <i class="fas fa-file-pdf"></i> Stáhnout Bakalářskou práci (PDF)
+                    </a>
+                `
+            },
+            {
+                id: 3,
+                title: "Desktopová Kalkulačka v C#",
+                image: "kalkulacka.jpg",
+                tags: ["C#", "Algoritmy"],
+                shortDesc: "Vlastní implementace kalkulačky s grafickým rozhraním. Obsahuje základní matematické operace a ošetření uživatelských vstupů.",
+                details: `
+                    <h2>Kalkulačka</h2>
+                    <p><strong>Cíl projektu:</strong> Praktické procvičení jazyka C# při tvorbě desktopové aplikace s grafickým uživatelským rozhraním.</p>
+                    <h3>Funkcionalita</h3>
+                    <ul>
+                        <li><strong>Základní operace:</strong> Sčítání, odčítání, násobení, dělení.</li>
+                        <li><strong>Ovládání:</strong> Interaktivní tlačítka i podpora klávesnice.</li>
+                        <li><strong>Validace:</strong> Ošetření dělení nulou a zadávání více desetinných čárek.</li>
+                        <li><strong>Historie:</strong> Zobrazení právě probíhající operace v horním displeji.</li>
+                    </ul>
+                    <h3>Celý kód (Form1.cs)</h3>
+                    <div class="code-block">
+using System;
+using System.Windows.Forms;
+
+namespace CalculatorApp
+{
+    public partial class Form1 : Form
+    {
+        Double resultValue = 0;
+        String operationPerformed = "";
+        bool isOperationPerformed = false;
+
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        private void button_click(object sender, EventArgs e)
+        {
+            if ((textBox_Result.Text == "0") || (isOperationPerformed))
+                textBox_Result.Clear();
+
+            isOperationPerformed = false;
+            Button button = (Button)sender;
+            if (button.Text == ".")
+            {
+                if (!textBox_Result.Text.Contains("."))
+                    textBox_Result.Text = textBox_Result.Text + button.Text;
+            }
+            else
+                textBox_Result.Text = textBox_Result.Text + button.Text;
+        }
+
+        private void operator_click(object sender, EventArgs e)
+        {
+            Button button = (Button)sender;
+
+            if (resultValue != 0)
+            {
+                button_equals.PerformClick();
+                operationPerformed = button.Text;
+                labelCurrentOperation.Text = resultValue + " " + operationPerformed;
+                isOperationPerformed = true;
+            }
+            else
+            {
+                operationPerformed = button.Text;
+                resultValue = Double.Parse(textBox_Result.Text);
+                labelCurrentOperation.Text = resultValue + " " + operationPerformed;
+                isOperationPerformed = true;
+            }
+        }
+
+        private void button_ce_click(object sender, EventArgs e)
+        {
+            textBox_Result.Text = "0";
+        }
+
+        private void button_c_click(object sender, EventArgs e)
+        {
+            textBox_Result.Text = "0";
+            resultValue = 0;
+        }
+
+        private void button_equals_click(object sender, EventArgs e)
+        {
+            switch (operationPerformed)
+            {
+                case "+":
+                    textBox_Result.Text = (resultValue + Double.Parse(textBox_Result.Text)).ToString();
+                    break;
+                case "-":
+                    textBox_Result.Text = (resultValue - Double.Parse(textBox_Result.Text)).ToString();
+                    break;
+                case "*":
+                    textBox_Result.Text = (resultValue * Double.Parse(textBox_Result.Text)).ToString();
+                    break;
+                case "/":
+                    if(Double.Parse(textBox_Result.Text) != 0)
+                    {
+                         textBox_Result.Text = (resultValue / Double.Parse(textBox_Result.Text)).ToString();
+                    }
+                    else
+                    {
+                         MessageBox.Show("Nelze dělit nulou!");
+                    }
+                    break;
+                default:
+                    break;
+            }
+            resultValue = Double.Parse(textBox_Result.Text);
+            labelCurrentOperation.Text = "";
+        }
+    }
+}
+                    </div>
+                `
+            }
+        ];
+
+        // VYKRESLENÍ CAROUSELU
+        const carousel = document.getElementById('carousel');
+        let currentSlide = 0;
+        let autoSlideInterval;
+
+        function renderCarousel() {
+            // Přidání slidů
+            projects.forEach((proj, index) => {
+                const slide = document.createElement('div');
+                slide.classList.add('carousel-slide');
+                if (index === 0) slide.classList.add('active');
+                
+                slide.innerHTML = `
+                    <img src="${proj.image}" class="carousel-image" alt="${proj.title}">
+                    <div class="carousel-caption">
+                        <h2>${proj.title}</h2>
+                        <button onclick="openModal(${proj.id})" class="download-btn" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid white; pointer-events: auto;">Zobrazit projekt</button>
+                    </div>
+                `;
+                carousel.appendChild(slide);
+            });
+        }
+
+        function showSlide(index) {
+            const slides = document.querySelectorAll('.carousel-slide');
+            slides.forEach(slide => slide.classList.remove('active'));
+            
+            // Ošetření cyklení
+            if (index >= slides.length) currentSlide = 0;
+            else if (index < 0) currentSlide = slides.length - 1;
+            else currentSlide = index;
+
+            slides[currentSlide].classList.add('active');
+        }
+
+        function nextSlide() {
+            showSlide(currentSlide + 1);
+        }
+
+        function prevSlide() {
+            showSlide(currentSlide - 1);
+        }
+
+        // Ruční ovládání resetuje časovač
+        function manualNext() {
+            nextSlide();
+            resetTimer();
+        }
+
+        function manualPrev() {
+            prevSlide();
+            resetTimer();
+        }
+
+        function resetTimer() {
+            clearInterval(autoSlideInterval);
+            autoSlideInterval = setInterval(nextSlide, 5000);
+        }
+
+        // VYKRESLENÍ KARET
+        const grid = document.getElementById('projects-grid');
+
+        if (grid) {
+            projects.forEach(proj => {
+                const tagsHtml = proj.tags.map(tag => `<span class="tech-pill">${tag}</span>`).join('');
+                
+                const cardHTML = `
+                    <div class="card" onclick="openModal(${proj.id})"> 
+                        <img src="${proj.image}" alt="${proj.title}" class="card-img-top">
+                        <div class="card-content">
+                            <h3>${proj.title}</h3>
+                            <div class="tech-stack">${tagsHtml}</div>
+                            <p>${proj.shortDesc}</p>
+                            <button class="btn-link">
+                                Detail projektu <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                grid.innerHTML += cardHTML;
+            });
+        }
+
+        // INIT
+        renderCarousel();
+        autoSlideInterval = setInterval(nextSlide, 5000); // Spuštění automatické rotace
+
+        // OVLÁDÁNÍ MODÁLNÍHO OKNA
+        const modal = document.getElementById('project-modal');
+        const modalBody = document.getElementById('modal-body-content');
+
+        function openModal(id) {
+            const project = projects.find(p => p.id === id);
+            if (project) {
+                modalBody.innerHTML = project.details;
+                modal.style.display = "flex";
+                document.body.style.overflow = "hidden"; 
+            }
+        }
+
+        function closeModal() {
+            modal.style.display = "none";
+            document.body.style.overflow = "auto";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>
